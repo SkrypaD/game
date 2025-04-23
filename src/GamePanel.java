@@ -7,30 +7,50 @@ import java.util.HashSet;
 
 public class GamePanel extends JLayeredPane {
     private ArrayList<GameObject> gameObjects;
-    private JLabel score;
+    private GameLabel score;
+    private GameLabel health;
 
     private HashSet<Integer> pressedKeys = new HashSet<>();
 
     public GamePanel(final ArrayList<GameObject> gameObjects) {
         this.gameObjects = gameObjects;
         setBackground(new Color(24, 24, 24));
-        setLayout(null);
 
-        score = new JLabel("Score");
-        score.setFont(new Font("Arial", Font.BOLD, 24));
-        score.setForeground(new Color(240, 240, 240));
-        score.setBounds(10, 10, 250, 40);
+        score = new GameLabel("Score");
+        score.setBounds(10, 50, 250, 40);
         score.setHorizontalAlignment(SwingConstants.LEFT);
+
+        health = new GameLabel("Health");
+        health.setBounds(10, 90, 250, 40);
+        health.setHorizontalAlignment(SwingConstants.LEFT);
+
+        GameButton pauseButton = new GameButton("Pause");
+        pauseButton.setBounds(Game.WINDOW_WIDTH - 200, 50, 150, 50);
+        pauseButton.addActionListener(e -> {
+            if(Game.isPaused())
+                Game.unpauseGame();
+            else
+                Game.pauseGame();
+        });
+
+        GameButton restartButton = new GameButton("Restart");
+        restartButton.setBounds(Game.WINDOW_WIDTH - 200, 120, 150, 50);
+        restartButton.addActionListener(e -> { Game.restartGame(); });
 
         setupKeyBindings();
 
+        add(pauseButton);
+        add(restartButton);
         add(score, JLayeredPane.PALETTE_LAYER);
+        add(health, JLayeredPane.PALETTE_LAYER);
     }
 
 
     @Override
     protected void paintComponent(Graphics g) {
         score.setText("Score: " + Game.getScore());
+        health.setText("Health: " + Game.getPlayerHealth());
+
         super.paintComponent(g);
         for(GameObject obj : gameObjects) {
             if(obj instanceof HardBody) {
@@ -68,7 +88,6 @@ public class GamePanel extends JLayeredPane {
             }
         });
 
-        // Released actions
         actionMap.put("leftReleased", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

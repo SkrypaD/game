@@ -3,18 +3,11 @@ import java.awt.*;
 
 public class GameButton extends JButton {
     private Vector2 position;
-    public GameButton(String text, Vector2 position, int width, int height) {
+    public GameButton(String text){
         super(text);
-        setBounds(position.getX(), position.getY(), width, height);
         setContentAreaFilled(false);
         setFocusPainted(false);
         setFont(new Font("Arial", Font.BOLD, 24));
+        setForeground(new Color(240, 240, 240));
     }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-    }
-
-
 }

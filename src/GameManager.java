@@ -1,9 +1,14 @@
 import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GameManager extends JFrame {
+    private Player player;
+
+    public GameManager(Player player) {
+        this.player = player;
+    }
+
     public void update(ArrayList<GameObject> gameObjects) {
         for(GameObject gameObject : gameObjects) {
             gameObject.update();
@@ -15,17 +20,15 @@ public class GameManager extends JFrame {
         for(GameObject gameObject : gameObjects) {
             if(gameObject.getToDispose()){
                 gameObject.onDispose();
-                if(gameObject instanceof Player){
-
-                }
                 if(gameObject instanceof Enemy && ((Enemy) gameObject).position.getY() < Game.WINDOW_HEIGHT){
+                    upgradePlayer();
                     Game.increaseScore(50);
                 }
                 toDispose.add(gameObject);
                 gameObject.onDispose();
             }
         }
-        gameObjects.removeAll(toDispose);
+        if(toDispose.size() > 0) gameObjects.removeAll(toDispose);
     }
 
 
@@ -46,6 +49,17 @@ public class GameManager extends JFrame {
                     second.onCollision(first);
                 }
             }
+        }
+    }
+
+    public void upgradePlayer(){
+        Random rand = new Random();
+        int randomNum = rand.nextInt(100);
+
+        if(randomNum < Game.BONUS_CHANCE){
+            randomNum = rand.nextInt(Upgrade.values().length);
+            Upgrade randomUpgrade = Upgrade.fromId(randomNum);
+            randomUpgrade.apply(player);
         }
     }
 }

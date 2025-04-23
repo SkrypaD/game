@@ -18,6 +18,9 @@ public class Rocket extends HardBody{
     public void update(){
         super.update();
         position = new Vector2(position.getX(), position.getY() - speed);
+        if(position.getY() < 0){
+            toDispose = true;
+        }
     }
 
     @Override

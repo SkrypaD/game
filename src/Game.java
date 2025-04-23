@@ -8,73 +8,53 @@ public final class Game {
     private static ArrayList<GameObject> gameObjectsToBeAdded;
     private static GameFrame frame;
     private static GamePanel gamePanel;
-    private static GameManager gameManager;
+    private static MenuPanel menuPanel;
     private static Timer timer;
+    private static EnemySpawner spawner;
+    private static GameManager gameManager;
 
-    private static int score;
     public static final int WINDOW_HEIGHT = 800;
     public static final int WINDOW_WIDTH = 800;
+    public static final int BONUS_CHANCE = 5;
+    private static int score;
     private static boolean paused = false;
 
     private static double startTime;
     private static double currentTime;
 
-
-    private static JLabel health;
     private static Player player;
 
     private Game(){
         gameObjects = new ArrayList<>();
         gameObjectsToBeAdded = new ArrayList<>();
-        gameManager = new GameManager();
+
         gamePanel = new GamePanel(gameObjects);
+        menuPanel = new MenuPanel();
+
         frame = new GameFrame(WINDOW_HEIGHT, WINDOW_WIDTH);
-        frame.add(gamePanel);
-
-        GameButton button = new GameButton("Start", new Vector2(WINDOW_WIDTH - 150, 50), 100, 50);
-        button.addActionListener(e -> {
-            paused = !paused;
-            if(paused && timer.isRunning()) {
-                timer.stop();
-            }else {
-                timer.restart();
-            }
-        });
-        button.setForeground(new Color(240, 240, 240));
-
-        EnemySpawner spawner = new EnemySpawner();
-
-
-
-        Image img = new ImageIcon("f16.png").getImage();
-        Vector2 pos = new Vector2(WINDOW_WIDTH / 2, WINDOW_HEIGHT - 200);
-        player = new Player(pos, 100, 100, 15, img, 100, 100, gamePanel.getPressedKeys());
-        gameObjects.add(player);
-
-        health = new JLabel("health: " + player.getHealth());
-        health.setFont(new Font("Arial", Font.BOLD, 24));
-        health.setForeground(new Color(240, 240, 240));
-        health.setBounds(10, 40, 250, 40);
-        health.setHorizontalAlignment(SwingConstants.LEFT);
-
-        gamePanel.add(health);
-        gamePanel.add(button);
-
+        frame.add(menuPanel);
     }
 
-    public void run(){
+    private void run(){
+        player = new Player(100, 100, 15, new ImageIcon("f16.png").getImage(), 100, 100, gamePanel.getPressedKeys());
+        spawner = new EnemySpawner(3);
+        gameManager = new GameManager(player);
+
+        gameObjects.add(player);
+
         timer = new Timer(32, e -> {
             currentTime = System.currentTimeMillis() - startTime;
-            gameObjects.addAll(gameObjectsToBeAdded);
-            gameObjectsToBeAdded.clear();
-
-            health.setText("health: " + player.getHealth());
+            if(gameObjectsToBeAdded.size() > 0) {
+                gameObjects.addAll(gameObjectsToBeAdded);
+                gameObjectsToBeAdded.clear();
+            }
 
             gameManager.update(gameObjects);
-            gamePanel.repaint();
             gameManager.checkCollision(gameObjects);
             gameManager.disposeOfObjects(gameObjects);
+            gamePanel.repaint();
         });
+
         timer.start();
         startTime = System.currentTimeMillis();
     }
@@ -84,6 +64,35 @@ public final class Game {
             instance = new Game();
         }
         return instance;
+    }
+
+    public static void startGame(){
+        frame.remove(menuPanel);
+        frame.add(gamePanel);
+        frame.revalidate();
+        frame.repaint();
+        instance.run();
+    }
+
+    public static void restartGame(){
+        gameObjects.clear();
+        gameObjectsToBeAdded.clear();
+        startTime = System.currentTimeMillis();
+        score = 0;
+
+        player.onDispose();
+        player = new Player(100, 100, 15, new ImageIcon("f16.png").getImage(), 100, 100, gamePanel.getPressedKeys());
+        gameObjects.add(player);
+    }
+
+    public static boolean isPaused(){ return paused; }
+    public static void pauseGame(){
+        paused = true;
+        timer.stop();
+    }
+    public static void unpauseGame(){
+        paused = false;
+        timer.restart();
     }
 
     public static void addGameObject(GameObject gameObject){
@@ -97,6 +106,7 @@ public final class Game {
         }
     }
 
+    public static double getPlayerHealth(){ return player.getHealth(); }
     public static int getScore(){ return score; }
     public static int getCurrentTimeInSeconds(){ return (int)(currentTime / 1000); }
     public static int getCurrentTimeInMinutes(){ return (int)(currentTime / 1000 / 60); }

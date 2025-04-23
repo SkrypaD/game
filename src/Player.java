@@ -9,9 +9,10 @@ public class Player extends Character{
     private int rocketSpeed = 15;
     private int attackSpeed = 3;
     private Timer fireRate;
+    private int lastShot;
 
-    public Player(Vector2 position, int width, int height, int speed, Image sprite, double health, double damage, HashSet<Integer> pressedKeys) {
-        super(position, width, height, speed, sprite, health, damage);
+    public Player(int width, int height, int speed, Image sprite, double health, double damage, HashSet<Integer> pressedKeys) {
+        super(new Vector2(Game.WINDOW_WIDTH / 2 - width, Game.WINDOW_HEIGHT - height * 2), width, height, speed, sprite, health, damage);
         this.pressedKeys = pressedKeys;
 
         fireRate = new Timer(1000 / attackSpeed, e -> {
@@ -22,6 +23,9 @@ public class Player extends Character{
 
     @Override
     public void update(){
+        super.update();
+
+
 
         if (pressedKeys.contains(KeyEvent.VK_LEFT) && position.getX() > 0) {
             position.setX(position.getX() - speed);
@@ -37,7 +41,11 @@ public class Player extends Character{
     }
 
     @Override
-    public void onDispose(){
-        fireRate.stop();
-    }
+    public void onDispose(){ fireRate.stop(); }
+
+    public void increaseRocketSpeed(int upgrade){ rocketSpeed += upgrade; }
+    public void increasePlayerSpeed(int upgrade){ speed += upgrade; }
+    public void increaseAttackSpeed(int upgrade){ attackSpeed += upgrade; }
+    public void increaseHealth(int upgrade){ health += upgrade; }
+    public void increaseDamage(int upgrade){ damage += upgrade; }
 }
