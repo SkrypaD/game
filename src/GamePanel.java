@@ -37,10 +37,15 @@ public class GamePanel extends JLayeredPane {
         restartButton.setBounds(Game.WINDOW_WIDTH - 200, 120, 150, 50);
         restartButton.addActionListener(e -> { Game.restartGame(); });
 
+        GameButton homeButton = new GameButton("Home");
+        homeButton.setBounds(Game.WINDOW_WIDTH - 200, 190, 150, 50);
+        homeButton.addActionListener(e -> { Game.goToMainMenu(); });
+
         setupKeyBindings();
 
         add(pauseButton);
         add(restartButton);
+        add(homeButton);
         add(score, JLayeredPane.PALETTE_LAYER);
         add(health, JLayeredPane.PALETTE_LAYER);
     }

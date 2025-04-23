@@ -2,8 +2,10 @@ import java.awt.*;
 
 public class Enemy extends Character {
 
-    public Enemy(Vector2 position, int width, int height, int speed, Image sprite, double health, double damage) {
+    private int enemyCost;
+    public Enemy(Vector2 position, int width, int height, int speed, Image sprite, double health, double damage, int enemyConst) {
         super(position, width, height, speed, sprite, health, damage);
+        this.enemyCost = enemyConst;
     }
 
     @Override
@@ -26,4 +28,7 @@ public class Enemy extends Character {
     private boolean isInWindow(){
         return position.getY() < Game.WINDOW_HEIGHT;
     }
+
+    public int getReward(){ return enemyCost; }
+
 }

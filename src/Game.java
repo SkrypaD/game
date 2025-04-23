@@ -17,6 +17,7 @@ public final class Game {
     public static final int WINDOW_WIDTH = 800;
     public static final int BONUS_CHANCE = 5;
     private static int score;
+    private static int userId;
     private static boolean paused = false;
 
     private static double startTime;
@@ -71,7 +72,11 @@ public final class Game {
         frame.add(gamePanel);
         frame.revalidate();
         frame.repaint();
-        instance.run();
+        if(startTime != currentTime){
+            unpauseGame();
+        }else{
+            instance.run();
+        }
     }
 
     public static void restartGame(){
@@ -88,10 +93,12 @@ public final class Game {
     public static boolean isPaused(){ return paused; }
     public static void pauseGame(){
         paused = true;
+        spawner.stopSpawn();
         timer.stop();
     }
     public static void unpauseGame(){
         paused = false;
+        spawner.restartSpawn();
         timer.restart();
     }
 
@@ -106,6 +113,17 @@ public final class Game {
         }
     }
 
+    public static void goToMainMenu(){
+        Game.pauseGame();
+        frame.remove(gamePanel);
+        frame.add(menuPanel);
+        menuPanel.repaint();
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    public static void setUserId(int userId){ instance.userId = userId; }
+    public static int getPlayerId(){ return userId; }
     public static double getPlayerHealth(){ return player.getHealth(); }
     public static int getScore(){ return score; }
     public static int getCurrentTimeInSeconds(){ return (int)(currentTime / 1000); }

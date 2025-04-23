@@ -8,7 +8,7 @@ public class DatabaseConnection {
 
     public DatabaseConnection() {
         try{
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/database", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://127.127.126.26:3306/game", "root", "");
         }catch(Exception e){
             System.out.println(e);
         }

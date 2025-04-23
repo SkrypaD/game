@@ -1,4 +1,8 @@
+import DataAccess.Repositories.RecordRepository;
+
 import javax.swing.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -20,9 +24,12 @@ public class GameManager extends JFrame {
         for(GameObject gameObject : gameObjects) {
             if(gameObject.getToDispose()){
                 gameObject.onDispose();
+                if(gameObject instanceof Player){
+                    loseGame();
+                }
                 if(gameObject instanceof Enemy && ((Enemy) gameObject).position.getY() < Game.WINDOW_HEIGHT){
                     upgradePlayer();
-                    Game.increaseScore(50);
+                    Game.increaseScore(((Enemy) gameObject).getReward());
                 }
                 toDispose.add(gameObject);
                 gameObject.onDispose();
@@ -62,5 +69,16 @@ public class GameManager extends JFrame {
             randomUpgrade.apply(player);
         }
     }
+
+    public void loseGame(){
+        RecordRepository recordRepository = new RecordRepository();
+        try{
+            recordRepository.createRecord(Game.getScore(), Game.getPlayerId(), LocalDate.now(), LocalTime.ofSecondOfDay(Game.getCurrentTimeInSeconds()));
+            Game.restartGame();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
 }
 
